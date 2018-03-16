@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.ReferenceCountUtil;
 
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
@@ -17,13 +18,15 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
         try {
             String body = new String(req, "UTF-8");
             System.out.println("server channel read msg:"+ body);
+            ReferenceCountUtil.release(msg);
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        String response = "hello from server";
+        String response = "hello from server\n";
         ByteBuf resp = Unpooled.copiedBuffer(response.getBytes());
         ctx.write(resp);
+        ctx.flush();
     }
 
     @Override
